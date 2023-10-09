@@ -26,7 +26,7 @@ export function Post() {
       const data = transformResponse(postResponse.data);
       dispatch(actions.fetchSingleData(data));
     }
-  }, [postResponse, dispatch]);
+  }, [postResponse, dispatch, id]);
 
   if (isLoading && !entities) {
     return <Loading />;

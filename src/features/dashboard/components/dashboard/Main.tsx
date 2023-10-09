@@ -1,5 +1,7 @@
 import { shallowEqual } from 'react-redux';
 import { useEffect, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
 
 import { Button } from '@/components/button/Button';
 import { useAppDispatch, useAppSelector } from '@/hooks';
@@ -7,9 +9,8 @@ import { useGetUser, useGetUserPost } from './_redux/mutation/Mutate';
 import Loading from '@/components/loading/Loading';
 import { actions } from './_redux';
 import Input from '@/components/input/input';
-import { useMutation } from '@tanstack/react-query';
 import { createUserPost, deletUserPost } from './_redux/Crud';
-import { toast } from 'react-toastify';
+import { isPictureURL, isText } from '@/utils/validate';
 
 export function Main() {
   const dispatch = useAppDispatch();
@@ -21,12 +22,11 @@ export function Main() {
     shallowEqual
   );
   const { userData, isLoading } = useGetUser(user.user.id);
-  const { ...userPost } = useGetUserPost(user.user.id);
+  const { refetch, ...userPost } = useGetUserPost(user.user.id);
   const mutation = useMutation(createUserPost);
   const deleteMutation = useMutation(deletUserPost);
   const { entities, statements } = state;
   const [payload, setPayload] = useState<any>();
-  const [load, setLoad] = useState(false);
 
   function handleChange(e: any, key: string, use?: 'USE_VALUE' | undefined) {
     setPayload((prev: any) => {
@@ -37,50 +37,42 @@ export function Main() {
     });
   }
 
-  const handleSubmit = () => {
-    const check = Boolean(
-      payload?.text?.length > 6 && payload?.text?.length < 50 && payload?.image
-    );
-    if (check) {
+  const handleSubmit = async () => {
+    const isImage = isPictureURL(payload?.image);
+    const isTest = isText(payload?.text);
+    !isImage && toast.error('Url not found for this image');
+    !isTest && toast.error('Make text Longer');
+    if (isImage && isTest) {
       const data = {
         ...payload,
         likes: 1,
         tags: ['Tech News', 'Football', 'Books'],
         owner: entities.id,
       };
-      mutation.mutate(data);
-      if (mutation.status === 'success') {
-        toast.success('Post Successfully Created');
-        dispatch(actions.fetchUserPost(userPost.userPost?.data));
-        setPayload(null);
-      } else {
-        toast.error('Something went wrong!!!');
-      }
-    } else {
-      toast.error('Please fill in the form');
+      await mutation.mutate(data, {
+        onSuccess: () => {
+          refetch();
+          toast.success('Post Successfully Created');
+          setPayload(null);
+        },
+        onError: (error: any) => {
+          toast.error(error?.response.data.data.email);
+        },
+      });
     }
   };
 
   const handleDelete = async (id: string) => {
-    await deleteMutation.mutate(id);
-    if (deleteMutation) {
-      setLoad(true);
-      if (deleteMutation.status === 'success') {
+    await deleteMutation.mutate(id, {
+      onSuccess: () => {
+        refetch();
         toast.success('Post Successfully Deleted');
-        dispatch(actions.fetchUserPost(userPost.userPost?.data));
-        toast.success('Refresh your System');
-      } else {
-        toast.error('Something went wrong!!!');
-      }
-    }
+      },
+      onError: (error: any) => {
+        toast.error(error?.response.data.data.email);
+      },
+    });
   };
-
-  useEffect(() => {
-    if (deleteMutation.data?.data) {
-      dispatch(actions.fetchUserPost(userPost.userPost?.data));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [load, deleteMutation.data?.data]);
 
   useEffect(() => {
     if (userData) {
@@ -89,8 +81,7 @@ export function Main() {
     if (userPost.userPost) {
       dispatch(actions.fetchUserPost(userPost.userPost?.data));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userData, userPost.userPost]);
+  }, [dispatch, userData, userPost.userPost]);
 
   if (isLoading && userPost.isLoading) {
     return <Loading />;
@@ -109,7 +100,7 @@ export function Main() {
             <div className="">
               <Input
                 label="Post Image"
-                placeholder="https://static0.gamerantimages.com/elderscrolls-online.jpg"
+                placeholder="https:your image url .jpg"
                 onChange={(e: any) => handleChange(e, 'image', 'USE_VALUE')}
               />
             </div>

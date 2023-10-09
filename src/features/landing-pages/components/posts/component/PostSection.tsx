@@ -1,38 +1,34 @@
 import { useEffect, useState } from 'react';
 import { data } from '@/data/categories';
 import { classNames } from '@/utils/className';
-import { useAppDispatch, useAppSelector } from '@/hooks';
-import { useGetPost } from '../_redux/mutation/Mutate';
-import { transformResponse } from '@/utils/transformData';
+import { useAppDispatch } from '@/hooks';
 import { actions } from '../_redux';
-import { toast } from 'react-toastify';
+import { transformResponse } from '@/utils/transformData';
+import { useGetPost } from '../_redux/mutation/Mutate';
 
 export function PostSection() {
   const dispatch = useAppDispatch();
   const { postsResponse } = useGetPost();
-  const state = useAppSelector((state) => state.posts);
   const [selected, setSelected] = useState(data[0]);
+  const [update, setUpdate] = useState<any>();
 
-  const { entities } = state;
+  useEffect(() => {
+    if (selected !== 'all') {
+      const updatedEntities = update.filter(
+        (entity: { category: string }) => entity.category === selected
+      );
+      dispatch(actions.fetchAllData(updatedEntities));
+    } else {
+      dispatch(actions.fetchAllData(update));
+    }
+  }, [dispatch, selected, update]);
 
   useEffect(() => {
     if (postsResponse) {
       const data = transformResponse(postsResponse.data.data);
-      if (selected !== 'all') {
-        const updatedEntities = entities.filter(
-          (entity: { category: string }) => entity.category === selected
-        );
-        if (updatedEntities.length <= 0) {
-          toast(`No available data for ${selected}`);
-          setSelected('all');
-          dispatch(actions.fetchAllData(data));
-        } else {
-          dispatch(actions.fetchAllData(updatedEntities));
-        }
-      }
+      setUpdate(data);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selected, dispatch]);
+  }, [postsResponse, selected]);
 
   return (
     <div className="overflow-x-auto scrollbar">

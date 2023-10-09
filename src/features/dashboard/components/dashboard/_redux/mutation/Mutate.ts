@@ -17,9 +17,12 @@ export function useGetUser(id: string) {
 }
 
 export function useGetUserPost(id: string) {
-  const { data, isLoading } = useQuery(['request', id], () => getUserPost(id));
+  const { data, isLoading, refetch } = useQuery(['request', id], () =>
+    getUserPost(id)
+  );
   return {
     userPost: data,
     isLoading,
+    refetch,
   };
 }

@@ -10,6 +10,7 @@ import img from '@/assets/images/auth.png';
 import { Button } from '@/components/button/Button';
 import Input from '@/components/input/input';
 import { routes } from '@/config/routes';
+import { checkAndRemoveSpaces, isValidEmail } from '@/utils/validate';
 
 export function SignUp() {
   const dispatch = useAppDispatch();
@@ -26,16 +27,29 @@ export function SignUp() {
     });
   }
 
-  const createUserProfile = () => {
-    if (payload.email && payload.firstName && payload.lastName) {
-      mutation.mutate(payload);
-      if (mutation.status === 'success') {
-        toast.success('Account Successfully Created');
-        dispatch(actions.postUserData(mutation.data.data));
-        navigate(routes.DASHBOARD);
-      } else {
-        toast.error('Something went wrong!!!');
+  const createUserProfile = async () => {
+    if (payload) {
+      const isEmailValid = isValidEmail(payload.email);
+      const isNameValid = Boolean(
+        checkAndRemoveSpaces(payload.firstName) &&
+          checkAndRemoveSpaces(payload.lastName)
+      );
+      !isNameValid && toast.error('Name length must be more than 3');
+      !isEmailValid && toast.error('Invalid email address');
+      if (isNameValid && isEmailValid) {
+        await mutation.mutate(payload, {
+          onSuccess: (data) => {
+            toast.success('Account Successfully Created');
+            dispatch(actions.postUserData(data.data));
+            navigate(routes.DASHBOARD);
+          },
+          onError: (error: any) => {
+            toast.error(error?.response.data.data.email);
+          },
+        });
       }
+    } else {
+      toast.error('Please provide your email');
     }
   };
 

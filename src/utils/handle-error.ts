@@ -1,6 +1,6 @@
 import { toast } from 'react-toastify';
 
-export default function handleErrorMessage(error: any, options: any) {
+export default function handleErrorMessage(error: any, options?: any) {
   const message = getErrorMessage(error);
   if (typeof message === 'string') {
     toast(message, { type: 'error', ...options });

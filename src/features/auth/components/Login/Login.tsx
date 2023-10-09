@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { actions } from '../SignUp/_redux';
+import { isValidEmail } from '@/utils/validate';
 
 export function Login() {
   const dispatch = useAppDispatch();
@@ -26,23 +27,24 @@ export function Login() {
 
   const handleSubmit = () => {
     if (payload) {
+      const isValid = isValidEmail(payload.email);
+      !isValid && toast.error('Invalid email address');
       const userDataString = localStorage.getItem('persist:root');
-      if (userDataString) {
+      if (isValid && userDataString) {
         const userData = JSON.parse(userDataString);
         const user = JSON.parse(userData.auth);
-        const check = user.user.email === payload.email;
+        const check = user?.user?.email === payload.email;
         if (check) {
           dispatch(actions.postUserData(user.user));
           navigate(routes.DASHBOARD);
           return;
         }
-        toast.error('Opps!!!, Email is not correct');
-      } else {
-        toast('No data found');
+        toast.error('Opps!!!, No data found!');
       }
       return;
+    } else {
+      toast.error('Please provide your email');
     }
-    toast.error('Please provide your email');
   };
 
   return (
@@ -100,7 +102,10 @@ export function Login() {
                 </p>
                 <div className="w-full h-0 border-dashed border border-black-300" />
               </div>
-              <button className="w-full flex items-center justify-center gap-5 text-white font-semibold text-lg tracking-wide uppercase rounded-md bg-purple-500 hover:bg-purple-800 py-2 px-4 md:px-8">
+              <button
+                onClick={() => toast('This feature is coming soon!!!')}
+                className="w-full flex items-center justify-center gap-5 text-white font-semibold text-lg tracking-wide uppercase rounded-md bg-purple-500 hover:bg-purple-800 py-2 px-4 md:px-8"
+              >
                 <div>
                   <img src={google} alt="google" width="32" height="34" />
                 </div>

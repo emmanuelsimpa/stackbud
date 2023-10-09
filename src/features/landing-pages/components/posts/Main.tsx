@@ -1,23 +1,34 @@
+import { useEffect, useState } from 'react';
+
 import Banner from '@/components/banner/Banner';
 import { HeroContent, PostList, PostSection } from './component';
-import { useEffect } from 'react';
 import { useGetPost } from './_redux/mutation/Mutate';
 import { useAppDispatch } from '@/hooks';
 import { actions } from './_redux';
 import Loading from '@/components/loading/Loading';
 import { transformResponse } from '@/utils/transformData';
+import Pagination from '@/components/pagination/Pagination';
 
 export function Posts() {
   const dispatch = useAppDispatch();
-  const { postsResponse, isLoading } = useGetPost();
+  const [currentPage, setCurrentPage] = useState(1);
+  const { postsResponse, isLoading, refetch } = useGetPost(currentPage);
+  const totalPages = 20;
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   useEffect(() => {
     if (postsResponse) {
       const data = transformResponse(postsResponse.data.data);
       dispatch(actions.fetchAllData(data));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [postsResponse]);
+  }, [dispatch, postsResponse]);
+
+  useEffect(() => {
+    refetch();
+  }, [currentPage, refetch]);
 
   if (isLoading) {
     return <Loading />;
@@ -39,6 +50,13 @@ export function Posts() {
       <section className=" pt-0  md:pt-8 px-8 md:px-8 lg:px-16">
         <PostSection />
         <PostList />
+        <div className="pt-16">
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+          />
+        </div>
       </section>
       <div className="mt-24 px-4">
         <Banner />

@@ -3,6 +3,6 @@ export const data = [
   'Trending',
   'Tech News',
   'Football',
-  'Enterpernuer',
+  'Entrepreneur',
   'Music',
 ];

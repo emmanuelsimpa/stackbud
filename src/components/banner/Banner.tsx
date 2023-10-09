@@ -1,3 +1,5 @@
+import { toast } from 'react-toastify';
+
 export default function Banner() {
   return (
     <section id="subscribe">
@@ -15,9 +17,13 @@ export default function Banner() {
           <input
             placeholder="Enjoy subscribing to this blog"
             className="rounded-md bg-white text-stone-950 text-base h-12 w-full  outline-none px-2 md:text-md"
+            disabled={true}
           />
 
-          <button className="text-white shadow-2xl font-semibold text-lg tracking-wide uppercase rounded-md bg-purple-800 hover:bg-purple-200 hover:text-purple-800 py-2 px-4 md:px-8">
+          <button
+            onClick={() => toast('This feature is coming soon!!!')}
+            className="text-white shadow-2xl font-semibold text-lg tracking-wide uppercase rounded-md bg-purple-800 hover:bg-purple-200 hover:text-purple-800 py-2 px-4 md:px-8"
+          >
             Subscribe
           </button>
         </div>
