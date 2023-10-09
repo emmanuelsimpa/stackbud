@@ -3,6 +3,7 @@ import Logo from '@/components/logo';
 import { routes } from '@/config/routes';
 import { useAppSelector } from '@/hooks';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 export function Header() {
   const state = useAppSelector((state) => state.auth);
@@ -17,8 +18,12 @@ export function Header() {
               <Button name="Create Blog" />
             </Link>
             {user ? (
-              <div>
-                <Button name={`${user.firstName}`} />
+              <div
+                onClick={() => toast('No Profile Page, Feature is coming soon')}
+              >
+                <button className="w-full text-white font-semibold text-lg tracking-wide uppercase rounded-full bg-purple-500 hover:bg-purple-800 py-2 px-2">
+                  {`${user.firstName.charAt(0)}${user.lastName.charAt(0)}`}
+                </button>
               </div>
             ) : (
               <Link to={routes.LOGIN}>

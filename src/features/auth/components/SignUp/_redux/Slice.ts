@@ -6,14 +6,6 @@ export const AuthSlice = createSlice({
   name: 'auth',
   initialState: initialState,
   reducers: {
-    catchError: (state, action) => {
-      state.error = `${action.type}: ${action.payload.error}`;
-      if (action.payload.callType === callTypes.list) {
-        state.listLoading = false;
-      } else {
-        state.actionsLoading = false;
-      }
-    },
     startCall: (state, action) => {
       state.error = null;
       if (action.payload.callType === callTypes.list) {
@@ -27,6 +19,14 @@ export const AuthSlice = createSlice({
       state.user = action.payload;
       state.actionsLoading = false;
       state.error = null;
+    },
+    catchError: (state, action) => {
+      state.error = `${action.type}: ${action.payload.error}`;
+      if (action.payload.callType === callTypes.list) {
+        state.listLoading = false;
+      } else {
+        state.actionsLoading = false;
+      }
     },
   },
 });

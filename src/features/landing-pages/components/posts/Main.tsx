@@ -15,8 +15,10 @@ export function Posts() {
   const { postsResponse, isLoading, refetch } = useGetPost(currentPage);
   const totalPages = 20;
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+  const handlePageChange = (page: any) => {
+    if (page !== '...') {
+      setCurrentPage(page);
+    }
   };
 
   useEffect(() => {

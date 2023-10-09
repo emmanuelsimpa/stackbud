@@ -16,6 +16,7 @@ import { routes } from '@/config/routes';
 
 export function Post() {
   const { id } = useParams();
+  // window.location.href = `/${id}`;
   const dispatch = useAppDispatch();
   const { postResponse, isLoading, isError } = useGetSinglePost(id as string);
   const state = useAppSelector((state) => state.post);

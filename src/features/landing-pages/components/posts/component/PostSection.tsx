@@ -19,11 +19,12 @@ export function PostSection() {
         (entity: { category: string }) => entity.category === selected
       );
       if (updatedEntities.length > 0) {
-        return dispatch(actions.fetchAllData(updatedEntities));
+        dispatch(actions.fetchAllData(updatedEntities));
+      } else {
+        toast('No selected category');
+        setSelected('all');
+        dispatch(actions.fetchAllData(update));
       }
-      toast('No selected category');
-      setSelected('all');
-      dispatch(actions.fetchAllData(update));
     } else {
       dispatch(actions.fetchAllData(update));
     }

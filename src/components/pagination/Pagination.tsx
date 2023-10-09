@@ -12,31 +12,38 @@ function Pagination({
   const [pageNumbers, setPageNumbers] = useState<any>([]);
 
   useEffect(() => {
-    const generatePageNumbers = () => {
-      const maxVisiblePages = 7;
+    const maxVisiblePages = 7;
+    const maxPageDiff = maxVisiblePages - 4; // Number of pages to show between first and last
 
-      if (totalPages <= maxVisiblePages) {
-        setPageNumbers([...Array(totalPages).keys()].map((page) => page + 1));
-      } else {
-        let startPage = currentPage - 2;
-        let endPage = currentPage + 2;
+    if (totalPages <= maxVisiblePages) {
+      setPageNumbers([...Array(totalPages).keys()].map((page) => page + 1));
+    } else {
+      let startPage = currentPage - Math.floor(maxPageDiff / 2);
+      let endPage = currentPage + Math.ceil(maxPageDiff / 2);
 
-        if (currentPage < 3) {
-          startPage = 1;
-          endPage = maxVisiblePages - 2;
-        } else if (currentPage > totalPages - 2) {
-          startPage = totalPages - maxVisiblePages + 3;
-          endPage = totalPages;
-        }
-
-        const pageArray = [...Array(endPage - startPage + 1).keys()].map(
-          (page) => page + startPage
-        );
-        setPageNumbers(pageArray);
+      if (currentPage < 3) {
+        startPage = 1;
+        endPage = maxVisiblePages - 2;
+      } else if (currentPage > totalPages - 2) {
+        startPage = totalPages - maxVisiblePages + 3;
+        endPage = totalPages;
       }
-    };
 
-    generatePageNumbers();
+      const pageArray: any = [...Array(endPage - startPage + 1).keys()].map(
+        (page) => page + startPage
+      );
+
+      // Add ellipsis and total page number
+      if (startPage > 2) {
+        pageArray.unshift('...');
+      }
+      if (endPage < totalPages - 1) {
+        pageArray.push('...');
+        pageArray.push(totalPages);
+      }
+
+      setPageNumbers(pageArray);
+    }
   }, [totalPages, currentPage]);
 
   return (
