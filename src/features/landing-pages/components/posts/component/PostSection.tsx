@@ -5,6 +5,7 @@ import { useAppDispatch } from '@/hooks';
 import { actions } from '../_redux';
 import { transformResponse } from '@/utils/transformData';
 import { useGetPost } from '../_redux/mutation/Mutate';
+import { toast } from 'react-toastify';
 
 export function PostSection() {
   const dispatch = useAppDispatch();
@@ -17,7 +18,12 @@ export function PostSection() {
       const updatedEntities = update.filter(
         (entity: { category: string }) => entity.category === selected
       );
-      dispatch(actions.fetchAllData(updatedEntities));
+      if (updatedEntities.length > 0) {
+        return dispatch(actions.fetchAllData(updatedEntities));
+      }
+      toast('No selected category');
+      setSelected('all');
+      dispatch(actions.fetchAllData(update));
     } else {
       dispatch(actions.fetchAllData(update));
     }
